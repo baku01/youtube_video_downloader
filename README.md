@@ -84,10 +84,14 @@ ytdl> https://www.youtube.com/watch?v=dQw4w9WgXcQ
 ```
 OPÇÕES:
     -o, --output <NOME>     Nome do arquivo de saída
-    -a, --audio-only        Download apenas do áudio (MP3)
+    -a, --audio-only        Download apenas do áudio em formato MP3
     -i, --interactive       Modo interativo
     -h, --help             Mostrar ajuda
     -V, --version          Mostrar versão
+
+FORMATOS DE SAÍDA:
+    • Vídeos: MP4 (melhor qualidade disponível)
+    • Áudios: MP3 (192 kbps)
 ```
 
 ## 🎨 Recursos Visuais
@@ -210,8 +214,6 @@ Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICE
 
 - 🐛 [Issues](https://github.com/baku01/youtube_video_downloader/issues)
 - 💬 [Discussions](https://github.com/baku01/youtube_video_downloader/discussions)
-- 📧 Email: your.email@example.com
-
 ---
 
 <div align="center">

@@ -27,14 +27,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .long("output")
                 .value_name("FILE")
                 .help("Nome do arquivo de saída")
-                .default_value("video"),
+                .default_value("download"),
         )
         .arg(
             Arg::new("audio-only")
                 .short('a')
                 .long("audio-only")
                 .action(clap::ArgAction::SetTrue)
-                .help("Baixar apenas o áudio (MP3)"),
+                .help("Baixar apenas o áudio em formato MP3"),
         )
         .arg(
             Arg::new("interactive")
@@ -94,6 +94,17 @@ async fn download_video(
     }
 
     println!("🔍 Verificando se yt-dlp está instalado...");
+    println!("🔍 Verificando se ffmpeg está instalado...");
+
+    // Verificar se ffmpeg está disponível
+    let check_ffmpeg = StdCommand::new("ffmpeg").arg("-version").output();
+    if check_ffmpeg.is_err() {
+        println!("{}", "❌ ffmpeg não encontrado!".red().bold());
+        return Err(
+            "O ffmpeg é necessário para juntar áudio e vídeo. Instale o ffmpeg e tente novamente."
+                .into(),
+        );
+    }
 
     // Verificar se yt-dlp está disponível
     let check_ytdlp = StdCommand::new("yt-dlp").arg("--version").output();
@@ -130,26 +141,29 @@ async fn download_video(
     let mut cmd = StdCommand::new("yt-dlp");
 
     if audio_only {
-        println!("📥 Baixando áudio...");
-        cmd.args([
-            "--extract-audio",
-            "--audio-format",
-            "mp3",
-            "--audio-quality",
-            "192K",
-            "-o",
-            &format!("{output_name}.%(ext)s"),
-            url,
-        ]);
-    } else {
-        println!("📥 Baixando vídeo...");
         cmd.args([
             "-f",
-            "best[height<=720]", // Limitar a 720p para downloads mais rápidos
+            "bestaudio",
+            "-x",
+            "--audio-format",
+            "mp3",
             "-o",
             &format!("{output_name}.%(ext)s"),
             url,
         ]);
+        println!("🎵 Baixando áudio em formato MP3...");
+    } else {
+        // Forçar download do melhor vídeo + melhor áudio em MP4
+        cmd.args([
+            "-f",
+            "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
+            "--merge-output-format",
+            "mp4",
+            "-o",
+            &format!("{output_name}.mp4"),
+            url,
+        ]);
+        println!("🎬 Baixando vídeo em formato MP4...");
     }
 
     // Executar download
@@ -422,9 +436,13 @@ async fn run_interactive_mode() -> Result<(), Box<dyn std::error::Error>> {
                                     if let Some(pos) = parts.iter().position(|&x| x == "-o") {
                                         if pos + 1 < parts.len() {
                                             parts[pos + 1]
+                                        } else if audio_only {
+                                            "audio"
                                         } else {
                                             "video"
                                         }
+                                    } else if audio_only {
+                                        "audio"
                                     } else {
                                         "video"
                                     };
@@ -491,9 +509,9 @@ async fn run_interactive_mode() -> Result<(), Box<dyn std::error::Error>> {
 fn show_help() {
     println!("{}", "📋 Comandos disponíveis:".cyan().bold());
     println!();
-    println!("{:<20} Baixar vídeo da URL", "download <URL>".green());
+    println!("{:<20} Baixar vídeo em MP4", "download <URL>".green());
     println!(
-        "{:<20} Baixar apenas áudio da URL",
+        "{:<20} Baixar apenas áudio em MP3",
         "download <URL> -a".green()
     );
     println!(
@@ -510,7 +528,8 @@ fn show_help() {
     println!("{}", "💡 Dicas:".yellow().bold());
     println!("  • Você pode colar URLs diretamente");
     println!("  • Suporte completo para YouTube Shorts");
-    println!("  • Use -a para áudio e -o para nome personalizado");
+    println!("  • Use -a para áudio MP3 e -o para nome personalizado");
+    println!("  • Vídeos são baixados em MP4, áudios em MP3");
     println!("  • Histórico de comandos disponível (↑/↓)");
     println!();
 }

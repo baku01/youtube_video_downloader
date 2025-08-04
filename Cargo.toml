@@ -1,0 +1,23 @@
+[package]
+name = "youtube_video_downloader"
+version = "0.1.0"
+edition = "2021"
+authors = ["Pedro Correa Siqueira"]
+description = "Uma ferramenta CLI simples para baixar vídeos e áudios do YouTube"
+license = "MIT"
+repository = "https://github.com/baku01/youtube_video_downloader"
+keywords = ["youtube", "downloader", "cli", "video", "audio"]
+categories = ["command-line-utilities", "multimedia"]
+
+[dependencies]
+clap = { version = "4.0", features = ["derive"] }
+reqwest = { version = "0.11", features = ["json"] }
+tokio = { version = "1.0", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+regex = "1.0"
+url = "2.0"
+rand = "0.8"
+crossterm = { version = "0.27", features = ["event-stream"] }
+rustyline = "13.0"
+colored = "2.0"

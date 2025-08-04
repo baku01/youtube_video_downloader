@@ -94,21 +94,17 @@ async fn download_video(
     }
 
     println!("🔍 Verificando se yt-dlp está instalado...");
-    
+
     // Verificar se yt-dlp está disponível
-    let check_ytdlp = StdCommand::new("yt-dlp")
-        .arg("--version")
-        .output();
-    
+    let check_ytdlp = StdCommand::new("yt-dlp").arg("--version").output();
+
     if check_ytdlp.is_err() {
         println!("{}", "❌ yt-dlp não encontrado!".red().bold());
         println!("{}", "📦 Instalando yt-dlp...".yellow());
-        
+
         // Tentar instalar yt-dlp via pip
-        let install_result = StdCommand::new("pip3")
-            .args(["install", "yt-dlp"])
-            .output();
-            
+        let install_result = StdCommand::new("pip3").args(["install", "yt-dlp"]).output();
+
         match install_result {
             Ok(output) => {
                 if !output.status.success() {
@@ -132,32 +128,42 @@ async fn download_video(
 
     // Preparar comando yt-dlp
     let mut cmd = StdCommand::new("yt-dlp");
-    
+
     if audio_only {
         println!("📥 Baixando áudio...");
         cmd.args([
             "--extract-audio",
-            "--audio-format", "mp3",
-            "--audio-quality", "192K",
-            "-o", &format!("{output_name}.%(ext)s"),
-            url
+            "--audio-format",
+            "mp3",
+            "--audio-quality",
+            "192K",
+            "-o",
+            &format!("{output_name}.%(ext)s"),
+            url,
         ]);
     } else {
         println!("📥 Baixando vídeo...");
         cmd.args([
-            "-f", "best[height<=720]", // Limitar a 720p para downloads mais rápidos
-            "-o", &format!("{output_name}.%(ext)s"),
-            url
+            "-f",
+            "best[height<=720]", // Limitar a 720p para downloads mais rápidos
+            "-o",
+            &format!("{output_name}.%(ext)s"),
+            url,
         ]);
     }
 
     // Executar download
     let output = cmd.output()?;
-    
+
     if output.status.success() {
         let content_type = if audio_only { "Áudio" } else { "Vídeo" };
-        println!("{}", format!("💾 {content_type} baixado com sucesso!").green().bold());
-        
+        println!(
+            "{}",
+            format!("💾 {content_type} baixado com sucesso!")
+                .green()
+                .bold()
+        );
+
         // Mostrar saída do yt-dlp se houver
         if !output.stdout.is_empty() {
             println!("{}", String::from_utf8_lossy(&output.stdout));
@@ -356,7 +362,7 @@ async fn show_random_ascii_art() {
 async fn run_interactive_mode() -> Result<(), Box<dyn std::error::Error>> {
     // Animação de entrada
     show_welcome_animation().await;
-    
+
     println!("{}", "🚀 Bem-vindo ao modo interativo!".green().bold());
     println!(
         "{}",
@@ -453,7 +459,10 @@ async fn run_interactive_mode() -> Result<(), Box<dyn std::error::Error>> {
                                 }
                                 Err(e) => {
                                     show_error_animation().await;
-                                    println!("{}", format!("❌ Erro no download: {e}").red().bold());
+                                    println!(
+                                        "{}",
+                                        format!("❌ Erro no download: {e}").red().bold()
+                                    );
                                 }
                             }
                         } else {
@@ -513,7 +522,7 @@ async fn show_welcome_animation() {
         "🎥 Carregando YouTube Downloader...",
         "📹 Carregando YouTube Downloader...",
     ];
-    
+
     for frame in &frames {
         print!("\r{}", frame.cyan());
         io::stdout().flush().unwrap();
@@ -530,7 +539,7 @@ async fn show_goodbye_animation() {
         "🧹 Limpando cache...",
         "✨ Concluído!",
     ];
-    
+
     for frame in &frames {
         println!("{}", frame.yellow());
         sleep(Duration::from_millis(300)).await;
@@ -545,13 +554,13 @@ async fn show_animated_help() {
 
 async fn clear_screen_with_animation() {
     let spinner = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
-    
+
     for i in 0..10 {
         print!("\r{} Limpando tela...", spinner[i % spinner.len()].cyan());
         io::stdout().flush().unwrap();
         sleep(Duration::from_millis(100)).await;
     }
-    
+
     print!("\x1B[2J\x1B[1;1H");
     io::stdout().flush().unwrap();
     println!("{}", "✨ Tela limpa!".green());
@@ -559,8 +568,13 @@ async fn clear_screen_with_animation() {
 
 async fn show_animated_stats(downloads: i32) {
     show_progress_bar("Calculando estatísticas", 100).await;
-    println!("{}", format!("📊 Downloads nesta sessão: {downloads}").cyan().bold());
-    
+    println!(
+        "{}",
+        format!("📊 Downloads nesta sessão: {downloads}")
+            .cyan()
+            .bold()
+    );
+
     if downloads > 0 {
         println!("{}", "🎉 Parabéns pelos downloads!".green());
     } else {
@@ -571,19 +585,19 @@ async fn show_animated_stats(downloads: i32) {
 async fn show_demo_animation() {
     println!("{}", "🎪 Demonstração de Animações".magenta().bold());
     println!();
-    
+
     // Spinner
     show_spinner("Demonstrando spinner", 2000).await;
-    
+
     // Progress bar
     show_progress_bar("Demonstrando barra de progresso", 50).await;
-    
+
     // Typing effect
     show_typing_animation("Este é um efeito de digitação! 🎯").await;
-    
+
     // Matrix effect
     show_matrix_effect().await;
-    
+
     println!("{}", "✨ Demonstração concluída!".green().bold());
 }
 
@@ -599,7 +613,7 @@ async fn show_url_detection_animation() {
 
 async fn show_success_animation() {
     let success_frames = ["✅", "🎉", "✅", "🎉", "✅"];
-    
+
     for frame in &success_frames {
         print!("\r{frame} Download concluído com sucesso!");
         io::stdout().flush().unwrap();
@@ -610,7 +624,7 @@ async fn show_success_animation() {
 
 async fn show_error_animation() {
     let error_frames = ["❌", "💥", "❌", "💥", "❌"];
-    
+
     for frame in &error_frames {
         print!("\r{frame} Erro no download!");
         io::stdout().flush().unwrap();
@@ -622,36 +636,40 @@ async fn show_error_animation() {
 async fn show_spinner(message: &str, duration_ms: u64) {
     let spinner = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
     let iterations = duration_ms / 100;
-    
+
     for i in 0..iterations {
-        print!("\r{} {}", spinner[(i % spinner.len() as u64) as usize].cyan(), message);
+        print!(
+            "\r{} {}",
+            spinner[(i % spinner.len() as u64) as usize].cyan(),
+            message
+        );
         io::stdout().flush().unwrap();
         sleep(Duration::from_millis(100)).await;
     }
-    
+
     println!("\r✅ {}", message.green());
 }
 
 async fn show_progress_bar(message: &str, steps: u64) {
     println!("{}", message.yellow());
-    
+
     for i in 0..=steps {
         let progress = (i as f64 / steps as f64 * 100.0) as u64;
         let filled = (i as f64 / steps as f64 * 20.0) as usize;
         let empty = 20 - filled;
-        
+
         let bar = format!(
             "[{}{}] {}%",
             "█".repeat(filled).green(),
             "░".repeat(empty).bright_black(),
             progress
         );
-        
+
         print!("\r{bar}");
         io::stdout().flush().unwrap();
         sleep(Duration::from_millis(50)).await;
     }
-    
+
     println!();
 }
 
@@ -666,9 +684,9 @@ async fn show_typing_animation(text: &str) {
 
 async fn show_matrix_effect() {
     println!("{}", "🔢 Efeito Matrix:".green().bold());
-    
+
     let matrix_chars = ["0", "1", "0", "1", "0", "1"];
-    
+
     for _ in 0..5 {
         let mut line = String::new();
         for _ in 0..50 {
@@ -678,7 +696,7 @@ async fn show_matrix_effect() {
         println!("{}", line.green());
         sleep(Duration::from_millis(100)).await;
     }
-    
+
     sleep(Duration::from_millis(500)).await;
 }
 
@@ -690,14 +708,16 @@ mod tests {
     #[test]
     fn test_is_youtube_url() {
         // Testa URLs válidas do YouTube
-        assert!(is_youtube_url("https://www.youtube.com/watch?v=dQw4w9WgXcQ"));
+        assert!(is_youtube_url(
+            "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        ));
         assert!(is_youtube_url("https://youtu.be/dQw4w9WgXcQ"));
         assert!(is_youtube_url("https://m.youtube.com/watch?v=dQw4w9WgXcQ"));
         assert!(is_youtube_url("https://youtube.com/watch?v=dQw4w9WgXcQ"));
         assert!(is_youtube_url("http://www.youtube.com/watch?v=dQw4w9WgXcQ"));
         assert!(is_youtube_url("https://www.youtube.com/shorts/dQw4w9WgXcQ"));
         assert!(is_youtube_url("https://youtube.com/shorts/dQw4w9WgXcQ"));
-        
+
         // Testa URLs inválidas
         assert!(!is_youtube_url("https://www.google.com"));
         assert!(!is_youtube_url("https://vimeo.com/123456"));
@@ -710,7 +730,7 @@ mod tests {
     fn test_check_yt_dlp_installation() {
         // Testa se conseguimos verificar a instalação do yt-dlp
         let result = Command::new("which").arg("yt-dlp").output();
-        
+
         // O teste passa se conseguimos executar o comando 'which', independente do resultado
         assert!(result.is_ok() || result.is_err());
     }
@@ -719,17 +739,19 @@ mod tests {
     fn test_pip3_availability() {
         // Testa se pip3 está disponível para instalação do yt-dlp
         let result = Command::new("which").arg("pip3").output();
-        
+
         match result {
             Ok(_) => {
                 // pip3 encontrado
             }
             Err(_) => {
                 // pip3 pode não estar disponível em alguns sistemas
-                println!("pip3 não encontrado - isso pode afetar a instalação automática do yt-dlp");
+                println!(
+                    "pip3 não encontrado - isso pode afetar a instalação automática do yt-dlp"
+                );
             }
         }
-        
+
         // O teste sempre passa, apenas verifica a disponibilidade
         assert!(result.is_ok() || result.is_err());
     }
@@ -738,13 +760,13 @@ mod tests {
     async fn test_animation_functions() {
         // Testa se as funções de animação não causam panic
         // Nota: Estas são funções assíncronas que fazem I/O, então testamos apenas se executam
-        
+
         // Teste básico - verifica se as funções podem ser chamadas sem erro
         let result = std::panic::catch_unwind(|| {
             // Simula chamada das funções de animação em ambiente de teste
             "animation_test_passed"
         });
-        
+
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), "animation_test_passed");
     }
@@ -754,11 +776,14 @@ mod tests {
         // Testa casos extremos de validação de URL
         let test_cases = vec![
             ("https://www.youtube.com/watch?v=", false), // URL sem ID
-            ("https://youtu.be/", false), // URL curta sem ID
-            ("https://www.youtube.com/watch", false), // URL sem parâmetros
-            ("youtube.com/watch?v=dQw4w9WgXcQ", false), // URL sem protocolo
+            ("https://youtu.be/", false),                // URL curta sem ID
+            ("https://www.youtube.com/watch", false),    // URL sem parâmetros
+            ("youtube.com/watch?v=dQw4w9WgXcQ", false),  // URL sem protocolo
             ("https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=10s", true), // URL com timestamp
-            ("https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PLxxx", true), // URL com playlist
+            (
+                "https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PLxxx",
+                true,
+            ), // URL com playlist
         ];
 
         for (url, expected) in test_cases {
@@ -778,10 +803,19 @@ mod tests {
 
         for cmd in test_commands {
             let parts: Vec<&str> = cmd.split_whitespace().collect();
-            assert!(parts.len() >= 2, "Command should have at least 2 parts: {cmd}");
-            assert_eq!(parts[0], "download", "First part should be 'download': {cmd}");
+            assert!(
+                parts.len() >= 2,
+                "Command should have at least 2 parts: {cmd}"
+            );
+            assert_eq!(
+                parts[0], "download",
+                "First part should be 'download': {cmd}"
+            );
             // Note: We can't test is_youtube_url with 'test' as it's not a valid YouTube URL
-            assert!(parts[1].contains("youtu"), "Second part should contain 'youtu': {cmd}");
+            assert!(
+                parts[1].contains("youtu"),
+                "Second part should contain 'youtu': {cmd}"
+            );
         }
     }
 
@@ -789,7 +823,7 @@ mod tests {
     async fn test_download_with_mock_url() {
         // Teste que simula download com URL inválida (deve falhar graciosamente)
         let result = download_video("https://youtube.com/invalid", "test", false).await;
-        
+
         // O teste passa se a função não causa panic, independente do resultado
         // (pode falhar se yt-dlp não estiver instalado ou URL for inválida)
         match result {
@@ -802,7 +836,7 @@ mod tests {
                 println!("Download test failed as expected: {e}");
             }
         }
-        
+
         // O teste sempre passa, apenas verifica se não há panic
     }
 
@@ -810,14 +844,14 @@ mod tests {
     fn test_session_stats() {
         // Testa lógica de estatísticas de sessão
         let mut downloads = 0;
-        
+
         // Simula alguns downloads
         downloads += 1;
         assert_eq!(downloads, 1);
-        
+
         downloads += 1;
         assert_eq!(downloads, 2);
-        
+
         // Verifica se o contador funciona corretamente
         assert!(downloads > 0);
     }
@@ -826,10 +860,13 @@ mod tests {
     fn test_help_command_availability() {
         // Verifica se os comandos de ajuda estão definidos
         let help_commands = vec!["help", "exit", "quit", "clear", "stats", "demo"];
-        
+
         for cmd in help_commands {
             assert!(!cmd.is_empty(), "Help command should not be empty");
-            assert!(cmd.chars().all(|c| c.is_ascii_lowercase()), "Command should be lowercase: {cmd}");
+            assert!(
+                cmd.chars().all(|c| c.is_ascii_lowercase()),
+                "Command should be lowercase: {cmd}"
+            );
         }
     }
 }
